@@ -79,7 +79,9 @@ public class HangmanGame {
 
     private boolean isWin() {
         for (char c : secretWord.toCharArray()) {
-            if (!guessedLetters.contains(c)) return false;
+            if (!guessedLetters.contains(c)) {
+                return false;
+            }
         }
         return true;
     }
