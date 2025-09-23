@@ -94,7 +94,7 @@ public class HangmanGame {
 
     private void displayState() {
         System.out.println("\n" + getMaskedWord());
-        System.out.println("Ошибки: " + wrongLetters.size() + "/" + maxWrongGuesses);
+        System.out.printf("Ошибки: %d/%d%n", wrongLetters.size(), maxWrongGuesses);
         HangmanRenderer.renderPicture(wrongLetters.size());
         System.out.println("Использованные буквы: " + getUsedLetters());
     }
