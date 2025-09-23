@@ -102,7 +102,8 @@ public class HangmanGame {
     private String getMaskedWord() {
         StringBuilder sb = new StringBuilder();
         for (char c : secretWord.toCharArray()) {
-            sb.append(guessedLetters.contains(c) ? c : "_").append(" ");
+            char symbol = guessedLetters.contains(c) ? c : '_';
+            sb.append(symbol).append(" ");
         }
         return sb.toString().trim();
     }
