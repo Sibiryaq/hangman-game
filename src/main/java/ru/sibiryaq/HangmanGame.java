@@ -4,6 +4,8 @@ import java.util.*;
 
 public class HangmanGame {
     private static final String RUSSIAN_LETTER_REGEX = "[а-яёА-ЯЁ]";
+    private static final String DEFAULT_DICTIONARY_PATH = "/words.txt";
+
     private final WordDictionary dictionary;
     private String secretWord;
     private Set<Character> guessedLetters;
@@ -11,7 +13,7 @@ public class HangmanGame {
     private final int maxWrongGuesses;
 
     public HangmanGame() {
-        this.dictionary = new WordDictionary();
+        this.dictionary = new WordDictionary(DEFAULT_DICTIONARY_PATH);
         this.maxWrongGuesses = HangmanRenderer.getMaxPictures() - 1;
     }
 
