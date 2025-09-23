@@ -3,16 +3,16 @@ package ru.sibiryaq;
 import java.util.*;
 
 public class HangmanGame {
+    private static final String RUSSIAN_LETTER_REGEX = "[а-яёА-ЯЁ]";
     private final WordDictionary dictionary;
     private String secretWord;
     private Set<Character> guessedLetters;
     private Set<Character> wrongLetters;
-    private final int MAX_WRONG_GUESSES;
-    private static final String RUSSIAN_LETTER_REGEX = "[а-яёА-ЯЁ]";
+    private final int maxWrongGuesses;
 
     public HangmanGame() {
         this.dictionary = new WordDictionary();
-        this.MAX_WRONG_GUESSES = HangmanPicture.getMaxPictures() - 1;
+        this.maxWrongGuesses = HangmanRenderer.getMaxPictures() - 1;
     }
 
     public void startGame() {
@@ -21,7 +21,7 @@ public class HangmanGame {
 
         while (!isGameOver()) {
             displayState();
-            char letter = readLetter(scanner);
+            char letter = readPlayerLetter(scanner);
             processGuess(letter);
         }
 
@@ -34,12 +34,12 @@ public class HangmanGame {
         this.wrongLetters = new HashSet<>();
     }
 
-    private char readLetter(Scanner scanner) {
+    private char readPlayerLetter(Scanner scanner) {
         while (true) {
             System.out.print("Введите букву: ");
             String input = scanner.nextLine().trim();
 
-            if (input.length() == 1 && isRussianLetter(input)) {
+            if (input.length() == 1 && isValidRussianLetter(input)) {
                 return Character.toLowerCase(input.charAt(0));
             }
 
@@ -47,12 +47,12 @@ public class HangmanGame {
         }
     }
 
-    private boolean isRussianLetter(String input) {
+    private boolean isValidRussianLetter(String input) {
         return input != null && input.matches(RUSSIAN_LETTER_REGEX);
     }
 
     private void processGuess(char letter) {
-        if (isAlreadyTried(letter)) {
+        if (isUsedLetter(letter)) {
             System.out.println("Вы уже пробовали эту букву!");
             return;
         }
@@ -60,11 +60,11 @@ public class HangmanGame {
         if (secretWord.indexOf(letter) >= 0) {
             addCorrectGuess(letter);
         } else {
-            addWrongGuess(letter);
+            addWrongLetter(letter);
         }
     }
 
-    private boolean isAlreadyTried(char letter) {
+    private boolean isUsedLetter(char letter) {
         return guessedLetters.contains(letter) || wrongLetters.contains(letter);
     }
 
@@ -72,7 +72,7 @@ public class HangmanGame {
         guessedLetters.add(letter);
     }
 
-    private void addWrongGuess(char letter) {
+    private void addWrongLetter(char letter) {
         wrongLetters.add(letter);
         System.out.println("Нет такой буквы!");
     }
@@ -85,7 +85,7 @@ public class HangmanGame {
     }
 
     private boolean isLose() {
-        return wrongLetters.size() >= MAX_WRONG_GUESSES;
+        return wrongLetters.size() >= maxWrongGuesses;
     }
 
     private boolean isGameOver() {
@@ -94,8 +94,8 @@ public class HangmanGame {
 
     private void displayState() {
         System.out.println("\n" + getMaskedWord());
-        System.out.println("Ошибки: " + wrongLetters.size() + "/" + MAX_WRONG_GUESSES);
-        HangmanPicture.printPicture(wrongLetters.size());
+        System.out.println("Ошибки: " + wrongLetters.size() + "/" + maxWrongGuesses);
+        HangmanRenderer.renderPicture(wrongLetters.size());
         System.out.println("Использованные буквы: " + getUsedLetters());
     }
 
@@ -108,10 +108,10 @@ public class HangmanGame {
     }
 
     private String getUsedLetters() {
-        Set<Character> all = new TreeSet<>(Comparator.naturalOrder());
-        all.addAll(guessedLetters);
-        all.addAll(wrongLetters);
-        return all.toString();
+        Set<Character> usedLetters = new TreeSet<>(Comparator.naturalOrder());
+        usedLetters.addAll(guessedLetters);
+        usedLetters.addAll(wrongLetters);
+        return usedLetters.toString();
     }
 
     private void displayResult() {
@@ -119,7 +119,7 @@ public class HangmanGame {
         if (isWin()) {
             System.out.println("ПОБЕДА! Вы отгадали слово: " + secretWord.toUpperCase());
         } else {
-            HangmanPicture.printPicture(MAX_WRONG_GUESSES);
+            HangmanRenderer.renderPicture(maxWrongGuesses);
             System.out.println("ПОРАЖЕНИЕ! Загаданное слово: " + secretWord.toUpperCase());
         }
     }
