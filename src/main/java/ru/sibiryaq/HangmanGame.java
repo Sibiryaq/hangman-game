@@ -8,6 +8,7 @@ public class HangmanGame {
     private Set<Character> guessedLetters;
     private Set<Character> wrongLetters;
     private final int MAX_WRONG_GUESSES;
+    private static final String RUSSIAN_LETTER_REGEX = "[а-яёА-ЯЁ]";
 
     public HangmanGame() {
         this.dictionary = new WordDictionary();
@@ -36,12 +37,18 @@ public class HangmanGame {
     private char readLetter(Scanner scanner) {
         while (true) {
             System.out.print("Введите букву: ");
-            String input = scanner.nextLine().toLowerCase().trim();
-            if (input.length() == 1 && Character.isLetter(input.charAt(0))) {
-                return input.charAt(0);
+            String input = scanner.nextLine().trim();
+
+            if (input.length() == 1 && isRussianLetter(input)) {
+                return Character.toLowerCase(input.charAt(0));
             }
-            System.out.println("Пожалуйста, введите одну букву.");
+
+            System.out.println("Ошибка ввода! Введите одну русскую букву (А–Я).");
         }
+    }
+
+    private boolean isRussianLetter(String input) {
+        return input != null && input.matches(RUSSIAN_LETTER_REGEX);
     }
 
     private void processGuess(char letter) {
