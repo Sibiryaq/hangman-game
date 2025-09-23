@@ -16,9 +16,11 @@ public class WordDictionary {
     private final List<String> words;
     private final Random random = new Random();
     private final String dictionaryPath;
+    private final int minWordLength;
 
-    public WordDictionary(String dictionaryPath) {
+    public WordDictionary(String dictionaryPath, int minWordLength) {
         this.dictionaryPath = dictionaryPath;
+        this.minWordLength = minWordLength;
         this.words = load();
     }
 
@@ -26,8 +28,11 @@ public class WordDictionary {
         URL resource = getClass().getResource(dictionaryPath);
 
         if (resource == null) {
-            System.err.printf("Ошибка: файл словаря не найден: %s. Работа программы завершена.%n",
-                    Paths.get("src/main/resources/words.txt").toAbsolutePath());
+            System.err.printf(
+                    "Ошибка: файл словаря не найден: %s%n(ожидался путь: %s)%nРабота программы завершена.%n",
+                    dictionaryPath,
+                    Paths.get("src/main/resources" + dictionaryPath).toAbsolutePath()
+            );
             System.exit(1);
         }
 
@@ -37,7 +42,7 @@ public class WordDictionary {
             return reader.lines()
                     .map(String::trim)
                     .map(String::toLowerCase)
-                    .filter(word -> word.length() >= 4)
+                    .filter(word -> word.length() >= minWordLength)
                     .collect(Collectors.toList());
 
         } catch (IOException e) {
@@ -50,8 +55,10 @@ public class WordDictionary {
 
     public String getRandomWord() {
         if (words.isEmpty()) {
-            System.err.printf("Ошибка: файл словаря пуст: %s. Работа программы будет завершена.%n",
-                    Paths.get("src/main/resources/words.txt").toAbsolutePath());
+            System.err.printf(
+                    "Ошибка: файл словаря пуст: %s%nРабота программы будет завершена.%n",
+                    Paths.get("src/main/resources" + dictionaryPath).toAbsolutePath()
+            );
             System.exit(1);
         }
         return words.get(random.nextInt(words.size()));
