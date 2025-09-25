@@ -1,13 +1,14 @@
 package ru.sibiryaq;
 
 
+import ru.sibiryaq.exception.DictionaryException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -26,30 +27,35 @@ public class WordDictionary {
 
     private List<String> load() {
         URL resource = getClass().getResource(dictionaryPath);
-
         if (resource == null) {
-            System.err.printf(
-                    "Ошибка: файл словаря не найден: %s%n(ожидался путь: %s)%nРабота программы завершена.%n",
-                    dictionaryPath,
-                    Paths.get("src/main/resources" + dictionaryPath).toAbsolutePath()
+            String devPath = Paths.get("src/main/resources" + dictionaryPath).toAbsolutePath().toString();
+            throw new DictionaryException(
+                    "Dictionary not found: " + dictionaryPath + " (dev: " + devPath + ")"
             );
-            System.exit(1);
         }
 
         try (var reader = new BufferedReader(
                 new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
 
-            return reader.lines()
+            List<String> words = reader.lines()
                     .map(String::trim)
                     .map(String::toLowerCase)
-                    .filter(word -> word.length() >= minWordLength)
+                    .filter(w -> w.length() >= minWordLength)
                     .collect(Collectors.toList());
 
+            if (words.isEmpty()) {
+                String where = "file".equalsIgnoreCase(resource.getProtocol())
+                        ? Paths.get(resource.getPath()).toAbsolutePath().toString()
+                        : resource.toString();
+                throw new DictionaryException("Dictionary is empty: " + where);
+            }
+            return words;
+
         } catch (IOException e) {
-            System.err.printf("Ошибка чтения файла словаря: %s. Работа программы завершена.%n",
-                    Paths.get(resource.getPath()).toAbsolutePath());
-            System.exit(1);
-            return Collections.emptyList();
+            String where = "file".equalsIgnoreCase(resource.getProtocol())
+                    ? Paths.get(resource.getPath()).toAbsolutePath().toString()
+                    : resource.toString();
+            throw new DictionaryException("Failed to read dictionary: " + where, e);
         }
     }
 
