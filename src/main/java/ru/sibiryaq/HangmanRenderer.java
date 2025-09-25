@@ -1,6 +1,6 @@
 package ru.sibiryaq;
 
-public class HangmanPicture {
+public class HangmanRenderer {
 
     private static final String[] PICTURES = {
             """
@@ -68,7 +68,7 @@ public class HangmanPicture {
         """
     };
 
-    public static void printPicture(int numPicture) {
+    public static void renderPicture(int numPicture) {
         if (numPicture < 0 || numPicture >= PICTURES.length) {
             throw new IllegalArgumentException("Картинка с номером " + numPicture + " не существует");
         }
